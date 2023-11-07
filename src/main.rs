@@ -87,8 +87,7 @@ where
 
 fn main() {
     let s = Stack::new();
-    let s = s.push(1u8);
-    let s = s.push(2u8);
+    let s = s.push(1u8).push(2u8).push(3u32).push("foo");
     dbg!(&s);
     let (h, s) = s.pop();
     dbg!(&h, &s);
