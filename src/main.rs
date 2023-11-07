@@ -36,6 +36,30 @@ impl<T: Node> Stack<T> {
         }
     }
 }
+impl<H, R: Node> Stack<NonEmpty<H, R>> {
+    fn pop(self: Stack<NonEmpty<H, R>>) -> (H, Stack<R>)
+    where
+        R: Node,
+        H: Sized,
+    {
+        let mut data = self.data;
+        let size_of_h = std::mem::size_of::<H>();
+        let h = unsafe {
+            data.drain(data.len() - size_of_h..)
+                .collect::<Vec<u8>>()
+                .as_ptr()
+                .cast::<H>()
+                .read()
+        };
+        (
+            h,
+            Stack {
+                _phantom: std::marker::PhantomData,
+                data: data,
+            },
+        )
+    }
+}
 
 #[derive(Debug)]
 struct Empty;
@@ -64,5 +88,8 @@ where
 fn main() {
     let s = Stack::new();
     let s = s.push(1u8);
-    dbg!(s);
+    let s = s.push(2u8);
+    dbg!(&s);
+    let (h, s) = s.pop();
+    dbg!(&h, &s);
 }
