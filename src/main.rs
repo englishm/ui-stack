@@ -28,7 +28,7 @@ impl<T: Node> Stack<T> {
         data.extend(h_as_bytes);
         Stack {
             _phantom: std::marker::PhantomData,
-            data: data,
+            data,
         }
     }
 }
@@ -51,7 +51,7 @@ impl<H, R: Node> Stack<NonEmpty<H, R>> {
             h,
             Stack {
                 _phantom: std::marker::PhantomData,
-                data: data,
+                data,
             },
         )
     }
