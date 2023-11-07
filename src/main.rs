@@ -46,6 +46,14 @@ impl<H, R: Node> Stack<NonEmpty<H, R>> {
     }
 }
 
+impl<H1, H2> From<Stack<NonEmpty<H1, NonEmpty<H2, Empty>>>> for (H1, H2) {
+    fn from(value: Stack<NonEmpty<H1, NonEmpty<H2, Empty>>>) -> (H1, H2) {
+        let (h1, s) = value.pop();
+        let (h2, _) = s.pop();
+        (h1, h2)
+    }
+}
+
 trait PopChain<H, R> {
     fn pop(self) -> (H, Stack<R>)
     where
@@ -85,8 +93,8 @@ fn main() {
     let s = Stack::new();
     let s = s.push(1u8).push(2u8).push(3u32).push("foo");
     dbg!(&s);
-    let (h, s) = s.pop();
+    let (h, s) = s.pop().pop();
     dbg!(&h, &s);
-    let (h, s) = s.pop().pop().pop();
+    let (h, s) = s.into();
     dbg!(&h, &s);
 }
