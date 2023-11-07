@@ -1,5 +1,3 @@
-trait Nil: Node {}
-
 trait Cons<H, T: Node>: Node {}
 
 trait Node {}
@@ -65,7 +63,6 @@ impl<H, R: Node> Stack<NonEmpty<H, R>> {
 struct Empty;
 
 impl Node for Empty {}
-impl Nil for Empty {}
 
 #[derive(Debug)]
 struct NonEmpty<H, T: Node> {
