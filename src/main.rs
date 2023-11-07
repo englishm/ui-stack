@@ -14,7 +14,6 @@ impl Stack<Empty> {
         }
     }
 }
-
 impl<T: Node> Stack<T> {
     fn push<H>(mut self: Stack<T>, h: H) -> Stack<NonEmpty<H, T>>
     where
@@ -47,9 +46,27 @@ impl<H, R: Node> Stack<NonEmpty<H, R>> {
     }
 }
 
+trait PopChain<H, R> {
+    fn pop(self) -> (H, Stack<R>)
+    where
+        R: Node,
+        H: Sized;
+}
+
+impl<H1, H2, R: Node> PopChain<H2, R> for (H1, Stack<NonEmpty<H2, R>>) {
+    fn pop(self) -> (H2, Stack<R>)
+    where
+        H1: Sized,
+        H2: Sized,
+        R: Node,
+    {
+        let (_h, s) = self;
+        s.pop()
+    }
+}
+
 #[derive(Debug)]
 struct Empty;
-
 impl Node for Empty {}
 
 #[derive(Debug)]
@@ -69,5 +86,7 @@ fn main() {
     let s = s.push(1u8).push(2u8).push(3u32).push("foo");
     dbg!(&s);
     let (h, s) = s.pop();
+    dbg!(&h, &s);
+    let (h, s) = s.pop().pop().pop();
     dbg!(&h, &s);
 }
