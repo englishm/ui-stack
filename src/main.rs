@@ -45,6 +45,11 @@ impl<H, R: Node> Stack<NonEmpty<H, R>> {
         (h, unsafe { std::mem::transmute(self) })
     }
 }
+impl From<Stack<Empty>> for () {
+    fn from(_value: Stack<Empty>) -> () {
+        ()
+    }
+}
 impl<H1> From<Stack<NonEmpty<H1, Empty>>> for (H1,) {
     fn from(value: Stack<NonEmpty<H1, Empty>>) -> (H1,) {
         let (h1, _s) = value.pop();
@@ -114,4 +119,7 @@ fn main() {
     let s = Stack::new().push("bar");
     let (h1,) = s.into();
     dbg!(&h1);
+    let s = Stack::new();
+    let unit: () = s.into();
+    dbg!(&unit);
 }
