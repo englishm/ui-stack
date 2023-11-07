@@ -16,44 +16,34 @@ impl Stack<Empty> {
 }
 
 impl<T: Node> Stack<T> {
-    fn push<H>(self: Stack<T>, h: H) -> Stack<NonEmpty<H, T>>
+    fn push<H>(mut self: Stack<T>, h: H) -> Stack<NonEmpty<H, T>>
     where
         Self: Sized,
         H: Sized,
     {
-        let mut data = self.data;
         let h_as_bytes = unsafe {
             std::slice::from_raw_parts(&h as *const H as *const u8, std::mem::size_of::<H>())
         };
-        data.extend(h_as_bytes);
-        Stack {
-            _phantom: std::marker::PhantomData,
-            data,
-        }
+        self.data.extend(h_as_bytes);
+        unsafe { std::mem::transmute(self) }
     }
 }
 impl<H, R: Node> Stack<NonEmpty<H, R>> {
-    fn pop(self: Stack<NonEmpty<H, R>>) -> (H, Stack<R>)
+    fn pop(mut self: Stack<NonEmpty<H, R>>) -> (H, Stack<R>)
     where
         R: Node,
         H: Sized,
     {
-        let mut data = self.data;
         let size_of_h = std::mem::size_of::<H>();
         let h = unsafe {
-            data.drain(data.len() - size_of_h..)
+            self.data
+                .drain(self.data.len() - size_of_h..)
                 .collect::<Vec<u8>>()
                 .as_ptr()
                 .cast::<H>()
                 .read()
         };
-        (
-            h,
-            Stack {
-                _phantom: std::marker::PhantomData,
-                data,
-            },
-        )
+        (h, unsafe { std::mem::transmute(self) })
     }
 }
 
