@@ -1,5 +1,3 @@
-trait Cons<H, T: Node>: Node {}
-
 trait Node {}
 
 #[derive(Debug)]
@@ -70,12 +68,6 @@ struct NonEmpty<H, T: Node> {
 }
 
 impl<H, T> Node for NonEmpty<H, T>
-where
-    H: Sized,
-    T: Node,
-{
-}
-impl<H, T> Cons<H, T> for NonEmpty<H, T>
 where
     H: Sized,
     T: Node,
