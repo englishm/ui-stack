@@ -27,6 +27,14 @@ impl<T: UType> Stack<T> {
         self.data.extend(h_as_bytes);
         unsafe { std::mem::transmute(self) }
     }
+
+    pub fn const_size(&self) -> usize {
+        T::const_size()
+    }
+
+    pub fn len(&self) -> usize {
+        T::const_len()
+    }
 }
 
 impl<H, R: UType> Stack<Cons<H, R>> {
