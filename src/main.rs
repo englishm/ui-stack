@@ -1,21 +1,37 @@
-trait Node {}
+trait UType {}
 
 #[derive(Debug)]
-struct Stack<T: Node> {
+struct Nil;
+impl UType for Nil {}
+
+#[derive(Debug)]
+struct Cons<H, T: UType> {
+    _phantom: std::marker::PhantomData<(H, T)>,
+}
+
+impl<H, T> UType for Cons<H, T>
+where
+    H: Sized,
+    T: UType,
+{
+}
+
+#[derive(Debug)]
+struct Stack<T: UType> {
     _phantom: std::marker::PhantomData<T>,
     data: Vec<u8>,
 }
 
-impl Stack<Empty> {
-    fn new() -> Stack<Empty> {
+impl Stack<Nil> {
+    fn new() -> Stack<Nil> {
         Stack {
             _phantom: std::marker::PhantomData,
             data: Vec::new(),
         }
     }
 }
-impl<T: Node> Stack<T> {
-    fn push<H>(mut self: Stack<T>, h: H) -> Stack<NonEmpty<H, T>>
+impl<T: UType> Stack<T> {
+    fn push<H>(mut self: Stack<T>, h: H) -> Stack<Cons<H, T>>
     where
         Self: Sized,
         H: Sized,
@@ -27,10 +43,10 @@ impl<T: Node> Stack<T> {
         unsafe { std::mem::transmute(self) }
     }
 }
-impl<H, R: Node> Stack<NonEmpty<H, R>> {
-    fn pop(mut self: Stack<NonEmpty<H, R>>) -> (H, Stack<R>)
+impl<H, R: UType> Stack<Cons<H, R>> {
+    fn pop(mut self: Stack<Cons<H, R>>) -> (H, Stack<R>)
     where
-        R: Node,
+        R: UType,
         H: Sized,
     {
         let size_of_h = std::mem::size_of::<H>();
@@ -45,27 +61,27 @@ impl<H, R: Node> Stack<NonEmpty<H, R>> {
         (h, unsafe { std::mem::transmute(self) })
     }
 }
-impl From<Stack<Empty>> for () {
-    fn from(_value: Stack<Empty>) -> () {
+impl From<Stack<Nil>> for () {
+    fn from(_value: Stack<Nil>) -> () {
         ()
     }
 }
-impl<H1> From<Stack<NonEmpty<H1, Empty>>> for (H1,) {
-    fn from(value: Stack<NonEmpty<H1, Empty>>) -> (H1,) {
+impl<H1> From<Stack<Cons<H1, Nil>>> for (H1,) {
+    fn from(value: Stack<Cons<H1, Nil>>) -> (H1,) {
         let (h1, _s) = value.pop();
         (h1,)
     }
 }
 
-impl<H1, H2> From<Stack<NonEmpty<H1, NonEmpty<H2, Empty>>>> for (H1, H2) {
-    fn from(value: Stack<NonEmpty<H1, NonEmpty<H2, Empty>>>) -> (H1, H2) {
+impl<H1, H2> From<Stack<Cons<H1, Cons<H2, Nil>>>> for (H1, H2) {
+    fn from(value: Stack<Cons<H1, Cons<H2, Nil>>>) -> (H1, H2) {
         let (h1, s) = value.pop();
         let (h2, _) = s.pop();
         (h1, h2)
     }
 }
-impl<H1, H2, H3> From<Stack<NonEmpty<H1, NonEmpty<H2, NonEmpty<H3, Empty>>>>> for (H1, H2, H3) {
-    fn from(value: Stack<NonEmpty<H1, NonEmpty<H2, NonEmpty<H3, Empty>>>>) -> (H1, H2, H3) {
+impl<H1, H2, H3> From<Stack<Cons<H1, Cons<H2, Cons<H3, Nil>>>>> for (H1, H2, H3) {
+    fn from(value: Stack<Cons<H1, Cons<H2, Cons<H3, Nil>>>>) -> (H1, H2, H3) {
         let (h1, s) = value.pop();
         let (h2, s) = s.pop();
         let (h3, _) = s.pop();
@@ -76,50 +92,23 @@ impl<H1, H2, H3> From<Stack<NonEmpty<H1, NonEmpty<H2, NonEmpty<H3, Empty>>>>> fo
 trait PopChain<H, R> {
     fn pop(self) -> (H, Stack<R>)
     where
-        R: Node,
+        R: UType,
         H: Sized;
 }
 
-impl<H1, H2, R: Node> PopChain<H2, R> for (H1, Stack<NonEmpty<H2, R>>) {
+impl<H1, H2, R: UType> PopChain<H2, R> for (H1, Stack<Cons<H2, R>>) {
     fn pop(self) -> (H2, Stack<R>)
     where
         H1: Sized,
         H2: Sized,
-        R: Node,
+        R: UType,
     {
         let (_h, s) = self;
         s.pop()
     }
 }
 
-#[derive(Debug)]
-struct Empty;
-impl Node for Empty {}
-
-#[derive(Debug)]
-struct NonEmpty<H, T: Node> {
-    _phantom: std::marker::PhantomData<(H, T)>,
-}
-
-impl<H, T> Node for NonEmpty<H, T>
-where
-    H: Sized,
-    T: Node,
-{
-}
-
 fn main() {
     let s = Stack::new();
-    let s = s.push(1u8).push(2u8).push(3u32).push("foo");
-    dbg!(&s);
-    let (h, s) = s.pop();
-    dbg!(&h, &s);
-    let (h1, h2, h3) = s.into();
-    dbg!(&h1, &h2, &h3);
-    let s = Stack::new().push("bar");
-    let (h1,) = s.into();
-    dbg!(&h1);
-    let s = Stack::new();
-    let unit: () = s.into();
-    dbg!(&unit);
+    let mut s = s.push(1u8).push(2u8).push(3u32).push("foo");
 }
