@@ -1,9 +1,7 @@
-pub trait UType {
+pub trait UType: Default {
     fn const_size() -> usize;
     fn const_len() -> usize;
 }
-trait NilT: UType {}
-trait ConsT: UType {}
 
 #[derive(Debug)]
 pub struct Nil;
@@ -16,7 +14,12 @@ impl UType for Nil {
         0
     }
 }
-impl NilT for Nil {}
+
+impl Default for Nil {
+    fn default() -> Self {
+        Self {}
+    }
+}
 
 #[derive(Debug)]
 pub struct Cons<H, T: UType> {
@@ -37,9 +40,10 @@ where
     }
 }
 
-impl<H, T> ConsT for Cons<H, T>
-where
-    H: Sized,
-    T: UType,
-{
+impl<H: Sized, T: UType> Default for Cons<H, T> {
+    fn default() -> Self {
+        Self {
+            _phantom: Default::default(),
+        }
+    }
 }

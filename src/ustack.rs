@@ -62,6 +62,16 @@ impl<H, R: UType> Stack<Cons<H, R>> {
     }
 }
 
+/*
+impl<H, R: UType, U: UType, const N: usize> Stack<Cons<H, R>> {
+    pub fn discard_n(mut self: Stack<Cons<H, R>>) -> Stack<U> {
+        let size_of_h = std::mem::size_of::<H>();
+        self.data.drain(self.data.len() - size_of_h..);
+        unsafe { std::mem::transmute(self) }
+    }
+}
+*/
+
 impl From<Stack<Nil>> for () {
     fn from(_value: Stack<Nil>) -> () {
         ()
@@ -89,24 +99,5 @@ impl<H1, H2, H3> From<Stack<Cons<H1, Cons<H2, Cons<H3, Nil>>>>> for (H1, H2, H3)
         let (h2, s) = s.pop();
         let (h3, _) = s.pop();
         (h1, h2, h3)
-    }
-}
-
-trait PopChain<H, R> {
-    fn pop(self) -> (H, Stack<R>)
-    where
-        R: UType,
-        H: Sized;
-}
-
-impl<H1, H2, R: UType> PopChain<H2, R> for (H1, Stack<Cons<H2, R>>) {
-    fn pop(self) -> (H2, Stack<R>)
-    where
-        H1: Sized,
-        H2: Sized,
-        R: UType,
-    {
-        let (_h, s) = self;
-        s.pop()
     }
 }
