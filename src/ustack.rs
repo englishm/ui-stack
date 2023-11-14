@@ -83,11 +83,21 @@ macro_rules! from_utype_for {
     }
 }
 
-//macro_rules! pop_statement {
-//    ($($HN:ty),+) => {
-//        let (h${count(($HN:ty),+ , 0)}, s) = s.pop(); (h${count(($HN:ty),+, 0)})
-//    }
-//}
+#[macro_export]
+// macro_rules! pop_statement {
+//     ($($HN:ty),+) => {
+//         //${count(HN)}
+//         // let (concat_idents!(h, ${count(HN, 0)}), s) = s.pop();
+//         // let foo = (concat_idents!(h, ${count(HN, 0)}));
+//         let f = (concat_idents!(foo, bar));
+//     };
+// }
+
+// TODO: make a new crate for this to live in...
+// #[proc_macro]
+// pub fn pop_statement() -> TokenStream {
+//     "foobar".parse().unwrap()
+// }
 
 impl From<Stack<Nil>> for () {
     fn from(_value: Stack<Nil>) -> () {
