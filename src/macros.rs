@@ -13,11 +13,14 @@ macro_rules! all_the_tuples {
     };
 }
 
+#[macro_export]
 macro_rules! utype {
     () => {crate::utype::Nil};
     ($H1:ty) => {crate::utype::Cons<$H1, crate::utype::Nil>};
     ($H1:ty, $($HN:ty),*) => { crate::utype::Cons< $H1, utype!($($HN),*) > };
 }
+
+pub(crate) use utype;
 
 #[cfg(test)]
 mod tests {

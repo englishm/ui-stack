@@ -83,6 +83,12 @@ macro_rules! from_utype_for {
     }
 }
 
+//macro_rules! pop_statement {
+//    ($($HN:ty),+) => {
+//        let (h${count(($HN:ty),+ , 0)}, s) = s.pop(); (h${count(($HN:ty),+, 0)})
+//    }
+//}
+
 impl From<Stack<Nil>> for () {
     fn from(_value: Stack<Nil>) -> () {
         ()
@@ -91,8 +97,8 @@ impl From<Stack<Nil>> for () {
 
 impl<H1> From<Stack<Cons<H1, Nil>>> for (H1,) {
     fn from(value: Stack<Cons<H1, Nil>>) -> (H1,) {
-        let (h1, _s) = value.pop();
-        (h1,)
+        todo!()
+        //pop_statement!(H1)
     }
 }
 
