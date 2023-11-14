@@ -1,3 +1,4 @@
+use crate::macros;
 use crate::utype::{Cons, Nil, UType};
 
 #[derive(Debug)]
@@ -71,6 +72,16 @@ impl<H, R: UType, U: UType, const N: usize> Stack<Cons<H, R>> {
     }
 }
 */
+
+macro_rules! from_utype_for {
+    ($($HN:ty),+) => {
+        impl From<Stack< utype!($($HN),+) > for ( $($HN),+ ) {
+            fn from(s: Stack< utype!($($HN),+) >) -> ( $($HN),+ ) {
+              todo!()
+            }
+        }
+    }
+}
 
 impl From<Stack<Nil>> for () {
     fn from(_value: Stack<Nil>) -> () {
