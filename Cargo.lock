@@ -5,3 +5,7 @@ version = 3
 [[package]]
 name = "ui-stack"
 version = "0.1.0"
+
+[[package]]
+name = "ui-stack-macros"
+version = "0.1.0"
