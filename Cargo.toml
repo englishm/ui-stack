@@ -1,2 +1,2 @@
 [workspace]
-members = ["ui-stack"]
+members = ["ui-stack", "ui-stack-macros"]
